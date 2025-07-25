@@ -1,4 +1,5 @@
 name = "aicutmp3online"
+type = "javascript"
 main = "src/worker.js"
 compatibility_date = "2025-07-25"
 
