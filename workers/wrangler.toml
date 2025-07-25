@@ -1,6 +1,6 @@
-name = "audio-editor-api"
+name = "aicutmp3online"
 main = "src/worker.js"
-compatibility_date = "2023-12-01"
+compatibility_date = "2025-07-25"
 
 [env.production]
 vars = { ENVIRONMENT = "production" }

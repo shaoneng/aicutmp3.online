@@ -3,12 +3,12 @@
 // export dynamically through wrangler, or we can potentially let users directly
 // add them as a sort of "plugin" system.
 
-import ENTRY, { __INTERNAL_WRANGLER_MIDDLEWARE__ } from "/Users/wushaoneng/Desktop/AI_project/audio-editor-mvp/workers/.wrangler/tmp/bundle-bOzV5T/middleware-insertion-facade.js";
+import ENTRY, { __INTERNAL_WRANGLER_MIDDLEWARE__ } from "/Users/wushaoneng/Desktop/AI_project/audio-editor-mvp/workers/.wrangler/tmp/bundle-UDr6hw/middleware-insertion-facade.js";
 import { __facade_invoke__, __facade_register__, Dispatcher } from "/opt/homebrew/Cellar/nvm/0.39.7/versions/node/v21.6.2/lib/node_modules/wrangler/templates/middleware/common.ts";
-import type { WorkerEntrypointConstructor } from "/Users/wushaoneng/Desktop/AI_project/audio-editor-mvp/workers/.wrangler/tmp/bundle-bOzV5T/middleware-insertion-facade.js";
+import type { WorkerEntrypointConstructor } from "/Users/wushaoneng/Desktop/AI_project/audio-editor-mvp/workers/.wrangler/tmp/bundle-UDr6hw/middleware-insertion-facade.js";
 
 // Preserve all the exports from the worker
-export * from "/Users/wushaoneng/Desktop/AI_project/audio-editor-mvp/workers/.wrangler/tmp/bundle-bOzV5T/middleware-insertion-facade.js";
+export * from "/Users/wushaoneng/Desktop/AI_project/audio-editor-mvp/workers/.wrangler/tmp/bundle-UDr6hw/middleware-insertion-facade.js";
 
 class __Facade_ScheduledController__ implements ScheduledController {
 	readonly #noRetry: ScheduledController["noRetry"];
