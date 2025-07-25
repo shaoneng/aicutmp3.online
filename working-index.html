@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>音频转录工具 - 工作版本</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <header class="bg-blue-600 text-white p-4">
+        <h1 class="text-2xl font-bold">音频转录工具</h1>
+    </header>
+
+    <div class="container mx-auto px-4 py-6">
+        <!-- 上传区域 -->
+        <div id="upload-section" class="mb-8">
+            <div id="drop-zone" class="border-2 border-dashed border-gray-300 rounded-lg p-12 text-center cursor-pointer">
+                <div class="text-6xl mb-4">🎵</div>
+                <p class="text-xl text-gray-600 mb-4">拖拽音频文件到此处或点击选择</p>
+                <button id="file-select" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg">
+                    选择文件
+                </button>
+                <input type="file" id="file-input" accept="audio/*" class="hidden">
+            </div>
+
+            <!-- 文件信息 -->
+            <div id="file-info" class="hidden mt-4 p-4 bg-white rounded-lg shadow">
+                <h3 class="font-semibold mb-2">文件信息</h3>
+                <p>文件名: <span id="file-name"></span></p>
+                <p>大小: <span id="file-size"></span></p>
+            </div>
+        </div>
+
+        <!-- 转录结果 -->
+        <div id="transcript-section" class="hidden bg-white rounded-lg shadow p-6">
+            <h2 class="text-lg font-semibold mb-4">转录结果</h2>
+            <div id="transcript-loading" class="hidden text-center py-8">
+                <div class="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+                <p>正在进行语音识别...</p>
+            </div>
+            <div id="transcript-content" class="hidden">
+                <div id="transcript-text" class="space-y-2"></div>
+            </div>
+            <div id="transcript-error" class="hidden text-red-600">
+                <p>语音识别失败，请重试</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 加载遮罩 -->
+    <div id="loading-overlay" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white p-8 rounded-lg text-center">
+            <div class="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+            <p id="loading-text">处理中...</p>
+        </div>
+    </div>
+
+    <script type="module">
+        // 内联所有必要的代码，避免模块加载问题
+        class WorkingAudioApp {
+            constructor() {
+                this.currentFile = null;
+                this.workerEndpoint = 'http://localhost:8787';
+                this.init();
+            }
+            
+            init() {
+                console.log('🚀 启动工作版本应用');
+                this.setupFileUpload();
+            }
+            
+            setupFileUpload() {
+                const dropZone = document.getElementById('drop-zone');
+                const fileInput = document.getElementById('file-input');
+                const fileSelect = document.getElementById('file-select');
+                
+                fileSelect.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    fileInput.click();
+                });
+                
+                dropZone.addEventListener('click', () => {
+                    fileInput.click();
+                });
+                
+                fileInput.addEventListener('change', (e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                        this.handleFile(file);
+                    }
+                });
+                
+                // 拖拽事件
+                dropZone.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    dropZone.classList.add('border-blue-500', 'bg-blue-50');
+                });
+                
+                dropZone.addEventListener('dragleave', (e) => {
+                    e.preventDefault();
+                    dropZone.classList.remove('border-blue-500', 'bg-blue-50');
+                });
+                
+                dropZone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    dropZone.classList.remove('border-blue-500', 'bg-blue-50');
+                    
+                    const files = e.dataTransfer.files;
+                    if (files.length > 0) {
+                        this.handleFile(files[0]);
+                    }
+                });
+            }
+            
+            async handleFile(file) {
+                console.log('📁 处理文件:', file.name);
+                this.currentFile = file;
+                
+                // 显示文件信息
+                document.getElementById('file-name').textContent = file.name;
+                document.getElementById('file-size').textContent = this.formatFileSize(file.size);
+                document.getElementById('file-info').classList.remove('hidden');
+                
+                // 显示转录区域
+                document.getElementById('transcript-section').classList.remove('hidden');
+                document.getElementById('transcript-loading').classList.remove('hidden');
+                
+                try {
+                    await this.transcribeFile(file);
+                } catch (error) {
+                    console.error('转录失败:', error);
+                    document.getElementById('transcript-loading').classList.add('hidden');
+                    document.getElementById('transcript-error').classList.remove('hidden');
+                }
+            }
+            
+            async transcribeFile(file) {
+                console.log('🎤 开始转录...');
+                
+                // 转换文件为base64
+                const base64Audio = await this.fileToBase64(file);
+                
+                // 调用API
+                const response = await fetch(this.workerEndpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        audioBase64: base64Audio,
+                        mimeType: file.type,
+                        compressed: false
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`API调用失败: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                this.displayResult(result);
+            }
+            
+            async fileToBase64(file) {
+                const arrayBuffer = await file.arrayBuffer();
+                const bytes = new Uint8Array(arrayBuffer);
+                let binary = '';
+                for (let i = 0; i < bytes.byteLength; i++) {
+                    binary += String.fromCharCode(bytes[i]);
+                }
+                return btoa(binary);
+            }
+            
+            displayResult(result) {
+                console.log('📝 显示结果:', result);
+                
+                document.getElementById('transcript-loading').classList.add('hidden');
+                
+                let segments = [];
+                
+                // 解析结果
+                if (result.segments && result.segments.length === 1 && result.segments[0].text.includes('```json')) {
+                    // 处理嵌套JSON
+                    const nestedText = result.segments[0].text;
+                    const cleanText = nestedText.replace(/```json/g, '').replace(/```/g, '').replace(/\\n/g, '').trim();
+                    
+                    try {
+                        const parsed = JSON.parse(cleanText);
+                        if (parsed.segments) {
+                            segments = parsed.segments;
+                        }
+                    } catch (e) {
+                        console.error('解析失败:', e);
+                    }
+                } else if (result.segments) {
+                    segments = result.segments;
+                }
+                
+                if (segments.length > 0) {
+                    this.displaySegments(segments);
+                    document.getElementById('transcript-content').classList.remove('hidden');
+                } else {
+                    document.getElementById('transcript-error').classList.remove('hidden');
+                }
+            }
+            
+            displaySegments(segments) {
+                const container = document.getElementById('transcript-text');
+                container.innerHTML = '';
+                
+                segments.forEach((segment, index) => {
+                    const div = document.createElement('div');
+                    div.className = 'p-3 bg-gray-50 rounded border-l-4 border-blue-400 cursor-pointer hover:bg-gray-100';
+                    const startTime = this.formatTimeStamp(segment.startTime);
+                    const endTime = this.formatTimeStamp(segment.endTime);
+                    
+                    div.innerHTML = `
+                        <div class="flex justify-between items-center">
+                            <span class="font-medium">${index + 1}. ${segment.text}</span>
+                            <span class="text-sm text-gray-500">[${startTime} - ${endTime}]</span>
+                        </div>
+                    `;
+                    container.appendChild(div);
+                });
+            }
+            
+            formatFileSize(bytes) {
+                if (bytes === 0) return '0 Bytes';
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            }
+            
+            // 格式化时间戳显示
+            formatTimeStamp(seconds) {
+                if (seconds < 60) {
+                    // 小于60秒，显示秒数
+                    return `${seconds.toFixed(1)}s`;
+                } else {
+                    // 大于等于60秒，显示分钟和秒数
+                    const minutes = Math.floor(seconds / 60);
+                    const remainingSeconds = Math.floor(seconds % 60);
+                    return `${minutes}m${remainingSeconds}s`;
+                }
+            }
+        }
+        
+        // 启动应用
+        new WorkingAudioApp();
+    </script>
+</body>
+</html>

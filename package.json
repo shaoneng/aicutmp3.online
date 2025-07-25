@@ -1,0 +1,30 @@
+{
+  "name": "audio-editor-mvp",
+  "version": "1.0.0",
+  "description": "基于网页的音频剪辑工具MVP版本",
+  "main": "index.html",
+  "scripts": {
+    "dev": "python -m http.server 8000",
+    "dev:frontend": "python -m http.server 8000",
+    "dev:workers": "cd workers && wrangler dev --port 8787",
+    "dev:all": "concurrently \"npm run dev:workers\" \"npm run dev:frontend\"",
+    "setup": "chmod +x scripts/dev-setup.sh && ./scripts/dev-setup.sh",
+    "build": "npm run copy-assets",
+    "copy-assets": "mkdir -p dist && cp -r src/* dist/ && cp -r public/* dist/",
+    "test": "playwright test",
+    "test:local": "node tests/local-test.js",
+    "check": "node check-setup.js",
+    "start:dev": "echo '启动本地开发环境...' && echo '1. 在一个终端运行: cd workers && wrangler dev --port 8787' && echo '2. 在另一个终端运行: python -m http.server 8000' && echo '3. 访问: http://localhost:8000/src/index.html'",
+    "stress-test": "node tests/stress-test.js"
+  },
+  "keywords": ["audio", "editor", "gemini", "ai", "transcription"],
+  "author": "Audio Editor Team",
+  "license": "MIT",
+  "devDependencies": {
+    "@playwright/test": "^1.40.0",
+    "concurrently": "^8.2.0"
+  },
+  "dependencies": {
+    "pako": "^2.1.0"
+  }
+}

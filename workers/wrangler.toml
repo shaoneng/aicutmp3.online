@@ -1,0 +1,10 @@
+name = "audio-editor-api"
+main = "src/worker.js"
+compatibility_date = "2023-12-01"
+
+[env.production]
+vars = { ENVIRONMENT = "production" }
+
+# 环境变量配置（需要在 Cloudflare Dashboard 中设置）
+# GEMINI_API_KEY = "your-gemini-api-key"
+# CORS_ORIGIN = "https://your-username.github.io"

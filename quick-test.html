@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>快速解析测试</title>
+</head>
+<body>
+    <h1>快速解析测试</h1>
+    <button onclick="testParse()">测试解析</button>
+    <div id="result"></div>
+
+    <script>
+        function testParse() {
+            // 你最新的输出格式
+            const text = '```json {"segments": [{"text": "Face the speaker.", "startTime": 0.5, "endTime": 1.46}, {"text": "Nod my head.", "startTime": 2.15, "endTime": 2.95}, {"text": "Keep quiet.", "startTime": 3.78, "endTime": 4.48}, {"text": "Listen to my teacher.", "startTime": 5.45, "endTime": 6.57}, {"text": "Put up my hand.", "startTime": 7.32, "endTime": 8.12}, {"text": "Wait your turn.", "startTime": 9.14, "endTime": 9.97}, {"text": "How can you be a good listener?", "startTime": 10.72, "endTime": 11.94}, {"text": "I see.", "startTime": 12.74, "endTime": 13.18}, {"text": "I have a question.", "startTime": 13.77, "endTime": 14.79}]} ```';
+            
+            console.log('原始文本:', text);
+            
+            // 清理策略
+            let cleaned = text.trim();
+            cleaned = cleaned.replace(/```json/g, '');
+            cleaned = cleaned.replace(/```/g, '');
+            cleaned = cleaned.trim();
+            
+            console.log('清理后:', cleaned);
+            
+            try {
+                const parsed = JSON.parse(cleaned);
+                console.log('解析成功:', parsed);
+                
+                if (parsed.segments && Array.isArray(parsed.segments)) {
+                    let html = '<h3>解析成功！</h3>';
+                    parsed.segments.forEach((segment, index) => {
+                        html += `<div>${segment.text} [${segment.startTime}s - ${segment.endTime}s]</div>`;
+                    });
+                    document.getElementById('result').innerHTML = html;
+                } else {
+                    document.getElementById('result').innerHTML = '<div style="color: red;">没有找到segments数组</div>';
+                }
+            } catch (error) {
+                console.error('解析失败:', error);
+                document.getElementById('result').innerHTML = '<div style="color: red;">JSON解析失败: ' + error.message + '</div>';
+            }
+        }
+    </script>
+</body>
+</html>
