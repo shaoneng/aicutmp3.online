@@ -5,9 +5,7 @@ export class TranscriptionService extends OptimizedTranscriptionParser {
     constructor(options = {}) {
         super(); // 调用父类构造函数
         
-        // 配置
-        const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-        this.workerEndpoint = isLocal ? 'http://localhost:8787/api/transcribe' : '/api/transcribe';
+        this.workerEndpoint = 'https://api.aicutmp3.online/api/transcribe';
         this.retryAttempts = 3;
         this.retryDelay = 1000; // 初始重试延迟（毫秒）
         this.isFirstCall = true;
