@@ -3,6 +3,7 @@ main = "functions/api/transcribe.js"
 compatibility_date = "2025-07-25"
 
 [env.production]
+name = "aicutmp3online"
 vars = { ENVIRONMENT = "production" }
 
 # 环境变量配置（需要在 Cloudflare Dashboard 中设置）
