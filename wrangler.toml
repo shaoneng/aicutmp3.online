@@ -1,5 +1,5 @@
 name = "aicutmp3online"
-main = "workers/src/worker.js"
+main = "functions/api/transcribe.js"
 compatibility_date = "2025-07-25"
 
 [env.production]
