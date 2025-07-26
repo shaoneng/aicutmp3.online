@@ -6,7 +6,8 @@ export class TranscriptionService extends OptimizedTranscriptionParser {
         super(); // 调用父类构造函数
         
         // 配置
-        this.workerEndpoint = 'http://localhost:8787/api/transcribe'; // 本地开发端点
+        const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        this.workerEndpoint = isLocal ? 'http://localhost:8787/api/transcribe' : '/api/transcribe';
         this.retryAttempts = 3;
         this.retryDelay = 1000; // 初始重试延迟（毫秒）
         this.isFirstCall = true;
