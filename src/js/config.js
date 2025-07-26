@@ -3,7 +3,8 @@ export const CONFIG = {
     // Workers API 端点
     // 本地测试: 'http://localhost:8787'
     // 生产环境: 'https://audio-editor-api.your-username.workers.dev'
-    WORKER_ENDPOINT: 'http://localhost:8787',
+    // 改为同域 API 路径
+    WORKER_ENDPOINT: '/api/transcribe',
     
     // 文件限制
     MAX_FILE_SIZE: 20 * 1024 * 1024, // 20MB

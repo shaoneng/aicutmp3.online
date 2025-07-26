@@ -3,63 +3,30 @@ export default {
     async fetch(request, env, ctx) {
         const url = new URL(request.url);
         
-        // 处理 CORS 预检请求
+        // 只处理 /api/transcribe 路径，其他返回 404
+    if (url.pathname === '/api/transcribe') {
         if (request.method === 'OPTIONS') {
-            return new Response(null, {
-                headers: {
-                    'Access-Control-Allow-Origin': '*',
-                    'Access-Control-Allow-Methods': 'POST, OPTIONS',
-                    'Access-Control-Allow-Headers': 'Content-Type',
-                    'Access-Control-Max-Age': '86400',
-                }
-            });
+          return handleCORS();
         }
-
-        // 路由处理
-        if (url.pathname === '/api/transcribe' && request.method === 'POST') {
-            return await handleTranscription(request, env);
+        if (request.method === 'POST') {
+          return await handleTranscription(request, env);
         }
-
-        // 健康检查端点
-        if (url.pathname === '/health' && request.method === 'GET') {
-            return new Response(JSON.stringify({ 
-                status: 'ok', 
-                timestamp: new Date().toISOString(),
-                service: 'audio-transcription'
-            }), {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Access-Control-Allow-Origin': '*'
-                }
-            });
-        }
-
-        // 根路径返回服务信息
-        if (url.pathname === '/' && request.method === 'GET') {
-            return new Response(JSON.stringify({
-                service: 'Audio Transcription API',
-                version: '1.0.0',
-                endpoints: {
-                    transcribe: '/api/transcribe (POST)',
-                    health: '/health (GET)'
-                }
-            }), {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Access-Control-Allow-Origin': '*'
-                }
-            });
-        }
-
-        // 未匹配的路由
-        return new Response('Not Found', {
-            status: 404,
-            headers: {
-                'Access-Control-Allow-Origin': '*'
-            }
-        });
+      }
+      
+      return new Response('API endpoint not found', { status: 404 });
     }
-};
+  };
+// 处理 CORS
+function handleCORS() {
+    return new Response(null, {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Access-Control-Max-Age': '86400'
+      }
+    });
+  }
 
 // 处理转录请求
 async function handleTranscription(request, env) {
