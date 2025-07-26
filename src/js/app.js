@@ -69,7 +69,7 @@ class AudioEditorApp {
         });
 
         // 设置本地 Workers 端点
-        this.transcriptionService.setWorkerEndpoint('http://localhost:8787/api/transcribe');
+        this.transcriptionService.setWorkerEndpoint('https://api.aicutmp3.online/api/transcribe');
 
         // 绑定重试按钮
         document.getElementById('retry-transcription').addEventListener('click', () => {
