@@ -1,11 +1,33 @@
 name = "aicutmp3online"
+<<<<<<< HEAD
+=======
+<<<<<<<< HEAD:workers/wrangler.toml
+>>>>>>> c10c57eb8eedd4e251c711e7aa84534174e55d20
 type = "javascript"
 main = "src/worker.js"
 compatibility_date = "2025-07-25"
 
+<<<<<<< HEAD
 [env.production]
 vars = { ENVIRONMENT = "production" }
 
 # 环境变量配置（需要在 Cloudflare Dashboard 中设置）
 # GEMINI_API_KEY = "your-gemini-api-key"
 # CORS_ORIGIN = "https://your-username.github.io"
+=======
+# 添加路由配置，让 /api/* 走这个 Worker
+routes = [
+  "aicutmp3.online/api/*"
+]
+========
+main = "functions/api/transcribe.js"
+compatibility_date = "2025-07-25"
+
+# [env.production]
+# vars = { ENVIRONMENT = "production" }
+
+# 环境变量配置（需要在 Cloudflare Dashboard 中设置）
+# GEMINI_API_KEY = "your-gemini-api-key"
+# CORS_ORIGIN = "https://your-username.github.io"
+>>>>>>>> c10c57eb8eedd4e251c711e7aa84534174e55d20:wrangler.toml
+>>>>>>> c10c57eb8eedd4e251c711e7aa84534174e55d20

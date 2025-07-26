@@ -1,9 +1,0 @@
-name = "aicutmp3online"
-type = "javascript"
-main = "src/worker.js"
-compatibility_date = "2025-07-25"
-
-# 添加路由配置，让 /api/* 走这个 Worker
-routes = [
-  "aicutmp3.online/api/*"
-]
