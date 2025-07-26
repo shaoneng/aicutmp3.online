@@ -1,8 +1,6 @@
 name = "aicutmp3online"
 main = "workers/src/worker.js"
 compatibility_date = "2025-07-25"
-
-
 routes = [
   "aicutmp3.online/api/*"
 ]
